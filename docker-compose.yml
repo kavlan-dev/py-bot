@@ -1,0 +1,10 @@
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: py-bot
+    container_name: py-bot
+    env_file:
+      - .env
+    restart: unless-stopped
