@@ -43,7 +43,7 @@ async def echo_handler(message: Message) -> None:
 async def main() -> None:
     config = load_config()
     if not config.get_token():
-        logging.error("BOT_TOKEN не указан")
+        logging.error("TOKEN не указан")
         return
 
     bot = Bot(
