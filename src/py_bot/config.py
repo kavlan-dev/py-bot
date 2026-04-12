@@ -12,13 +12,5 @@ class Config:
 
 def load_config() -> Config:
     return Config(
-        token=get_env_or_default("TOKEN", ""),
+        token=os.getenv("TOKEN", ""),
     )
-
-
-def get_env_or_default(varName: str, defaultVal: str) -> str:
-    val = os.getenv(varName)
-    if val is None:
-        val = defaultVal
-
-    return val
