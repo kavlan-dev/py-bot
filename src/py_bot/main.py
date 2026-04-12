@@ -4,12 +4,14 @@ import sys
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
+from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
 
 from py_bot.config import load_config
 from py_bot.depends import get_dog_service
+from py_bot.utils.logget import setup_logger
 
 dp = Dispatcher()
 dog_service = get_dog_service()
@@ -41,17 +43,28 @@ async def echo_handler(message: Message) -> None:
 
 
 async def main() -> None:
-    config = load_config()
-    if not config.get_token():
-        logging.error("TOKEN не указан")
+    cfg = load_config()
+    log = setup_logger()
+
+    TOKEN = cfg.get_token()
+    if TOKEN == "":
+        log.error("TOKEN не указан")
         return
 
-    bot = Bot(
-        token=config.get_token(),
-        default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN),
-    )
+    PROXY_URL = cfg.get_proxy_url()
 
-    await dp.start_polling(bot)
+    try:
+        session = AiohttpSession(proxy=PROXY_URL)
+
+        bot = Bot(
+            token=TOKEN,
+            default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN),
+            session=session,
+        )
+
+        await dp.start_polling(bot)
+    except Exception as e:
+        log.error(f"Произошла ошибка {e}")
 
 
 if __name__ == "__main__":
